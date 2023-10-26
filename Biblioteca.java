@@ -1,29 +1,40 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Biblioteca {
-    public String nome;
-    public ArrayList<Livro> livros;
+    private String nome;
+    public ArrayList<Midia> midias;
     public static ArrayList<Biblioteca> bibliotecas = new ArrayList<Biblioteca>();
 
     public Biblioteca(String nome){
         this.nome = nome;
-        this.livros = new ArrayList<>();
+        this.midias = new ArrayList<>();
 
         bibliotecas.add(this);
     }
+    
+    public String getNome(){
+        return this.nome;
+    }
+
+    public void setNome(String nome){
+        this.nome = nome;
+    }
+
+    
 
     public String toString(){
         return "Nome: "+ this.nome;
     }
 
-    public void adicionarLivro(Livro livro){
-        this.livros.add(livro);
 
+    public void adicionarLivro(Livro livro){
+        this.midias.add(livro);
     }
     
-    public void listarlivros(){
-        for (int i = 0; i < livros.size(); i++){
-            System.out.println(i + " - " + livros.get(i).toString());
+    public void listarMidias(){
+        for (int i = 0; i < midias.size(); i++){
+            System.out.println(i + " - " + midias.get(i).toString());
         }
     }
 

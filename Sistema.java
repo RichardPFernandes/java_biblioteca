@@ -30,7 +30,9 @@ public class Sistema {
                 case 1:
                     System.out.println("Digite o nome do autor");
                     String nome = sc.next();
-                    new Autor(nome);
+                    System.out.println("Digite a nacionalidade do autor");
+                    String nacionalidade = sc.next();
+                    new Autor(nome, nacionalidade);
                     break;
                 case 2:
                     if(Autor.autores.size() == 0){
@@ -96,7 +98,7 @@ public class Sistema {
                         }
                     } while (posicaoLivro < 0);
                     Livro livro = Livro.livros.get(posicaoLivro);
-                    if(biblioteca.livros.contains(livro)){
+                    if(biblioteca.midias.contains(livro)){
                         System.out.println("Livro já cadastrado na biblioteca");
                         break;
                     }
@@ -122,13 +124,13 @@ public class Sistema {
                         }
                     } while (posicaoBiblioteca < 0);
                     biblioteca = Biblioteca.bibliotecas.get(posicaoBiblioteca);
-                    System.out.println("Digite o numero do livro");
-                    biblioteca.listarlivros();
+                    System.out.println("Digite o numero da midia desejada");
+                    biblioteca.listarMidias();
                     posicaoLivro = -1;
                     do {
                         try {
                             posicaoLivro = sc.nextInt();
-                            if (posicaoLivro >= biblioteca.livros.size()) {
+                            if (posicaoLivro >= biblioteca.midias.size()) {
                                 throw new Exception("Livro Invalido");
                             }
                         } catch (Exception e) {
@@ -136,9 +138,9 @@ public class Sistema {
                             posicaoLivro = -1;
                         }
                     } while (posicaoLivro < 0);
-                    livro = biblioteca.livros.get(posicaoLivro);
+                    Midia midia = biblioteca.midias.get(posicaoLivro);
                     try {
-                        livro.emprestar();
+                        midia.emprestar();
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
@@ -164,12 +166,12 @@ public class Sistema {
                     } while (posicaoBiblioteca < 0);
                     biblioteca = Biblioteca.bibliotecas.get(posicaoBiblioteca);
                     System.out.println("Digite o numero do livro");
-                    biblioteca.listarlivros();
+                    biblioteca.listarMidias();
                     posicaoLivro = -1;
                     do {
                         try {
                             posicaoLivro = sc.nextInt();
-                            if (posicaoLivro >= biblioteca.livros.size()) {
+                            if (posicaoLivro >= biblioteca.midias.size()) {
                                 throw new Exception("Livro Invalido");
                             }
                         } catch (Exception e) {
@@ -177,9 +179,9 @@ public class Sistema {
                             posicaoLivro = -1;
                         }
                     } while (posicaoLivro < 0);
-                    livro = biblioteca.livros.get(posicaoLivro);
+                    midia = biblioteca.midias.get(posicaoLivro);
                     try {
-                        livro.devolver();
+                        midia.devolver();
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
