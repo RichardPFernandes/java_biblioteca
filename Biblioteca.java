@@ -31,6 +31,10 @@ public class Biblioteca {
     public void adicionarLivro(Livro livro){
         this.midias.add(livro);
     }
+
+    public void adiocionarMidiaDigital(MidiaDigital midiaDigital){
+        this.midias.add(midiaDigital);
+    }
     
     public void listarMidias(){
         for (int i = 0; i < midias.size(); i++){

@@ -13,8 +13,10 @@ public class Sistema {
             System.out.println("2 - Criar Livro");
             System.out.println("3 - Criar Biblioteca");
             System.out.println("4 - Adicionar Livro");
-            System.out.println("5 - Emprestar Livro");
-            System.out.println("6 - Devolver Livro");
+            System.out.println("5 - Emprestar Midia");
+            System.out.println("6 - Devolver Midia");
+            System.out.println("7 - Adicionar Midia Digital");
+            System.out.println("8 - Listar todas as midias");
             System.out.println("Digite a opção");
             try {
                 op = sc.nextInt();
@@ -40,7 +42,8 @@ public class Sistema {
                         break;
                     }
                     System.out.println("Digite o titulo");
-                    String titulo = sc.next();
+                    sc.nextLine();
+                    String titulo = sc.nextLine();
                     int posicaoAutor = -1;
                     do {
                         Autor.listarAutores();
@@ -105,7 +108,7 @@ public class Sistema {
                     biblioteca.adicionarLivro(livro);
                     break;
                 case 5:
-                    if(Biblioteca.bibliotecas.size() == 0 || Livro.livros.size() == 0){
+                    if(Biblioteca.bibliotecas.size() == 0){
                         System.out.println("Não existe biblioteca cadastrada ou livro cadastrado");
                         break;
                     }
@@ -146,8 +149,8 @@ public class Sistema {
                     }
                     break;
                 case 6:
-                    if(Biblioteca.bibliotecas.size() == 0 || Livro.livros.size() == 0){
-                        System.out.println("Não existe biblioteca cadastrada ou livro cadastrado");
+                    if(Biblioteca.bibliotecas.size() == 0){
+                        System.out.println("Não existe biblioteca cadastrada");
                         break;
                     }
                     System.out.println("Digite o numero da biblioteca");
@@ -186,6 +189,56 @@ public class Sistema {
                         System.out.println(e.getMessage());
                     }
                     break;
+                case 7:
+                 if(Biblioteca.bibliotecas.size() == 0){
+                        System.out.println("Não existe biblioteca cadastrada ou livro cadastrado");
+                        break;
+                    }
+                System.out.println("Digite o numero da biblioteca");
+                Biblioteca.listarBiblotecas();
+                posicaoBiblioteca = -1;
+                do {
+                        try {
+                            posicaoBiblioteca = sc.nextInt();
+                            if (posicaoBiblioteca >= Biblioteca.bibliotecas.size()) {
+                                throw new Exception("Biblioteca Invalida");
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Biblioteca Invalida");
+                            posicaoBiblioteca = -1;
+                        }
+                    } while (posicaoBiblioteca < 0);
+                biblioteca = Biblioteca.bibliotecas.get(posicaoBiblioteca);
+                System.out.println("Digite o album da midia digital");
+                String album = sc.nextLine();
+                album = sc.nextLine();
+                System.out.println("Digite o titulo");
+                titulo = sc.nextLine();
+                biblioteca.adiocionarMidiaDigital(new MidiaDigital(titulo, album, true));
+                break;
+
+                case 8:
+                System.out.println("Digite o numero da biblioteca");
+                Biblioteca.listarBiblotecas();
+                posicaoBiblioteca = -1;
+                do {
+                        try {
+                            posicaoBiblioteca = sc.nextInt();
+                            if (posicaoBiblioteca >= Biblioteca.bibliotecas.size()) {
+                                throw new Exception("Biblioteca Invalida");
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Biblioteca Invalida");
+                            posicaoBiblioteca = -1;
+                        }
+                    } while (posicaoBiblioteca < 0);
+                biblioteca = Biblioteca.bibliotecas.get(posicaoBiblioteca);
+                biblioteca.listarMidias();
+                System.out.println("Digite enter para continuar");
+                sc.nextLine();
+                sc.nextLine();
+        
+                break;
 
                 default:
                     System.out.println("Opcão invalida");
