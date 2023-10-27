@@ -17,6 +17,7 @@ public class Sistema {
             System.out.println("6 - Devolver Midia");
             System.out.println("7 - Adicionar Midia Digital");
             System.out.println("8 - Listar todas as midias");
+            System.out.println("9 - Listar todos autores");
             System.out.println("Digite a opção");
             try {
                 op = sc.nextInt();
@@ -238,6 +239,17 @@ public class Sistema {
                 sc.nextLine();
                 sc.nextLine();
         
+                break;
+
+                case 9:
+                if(Autor.autores.size() == 0){
+                    System.out.println("Não existe autores cadastrados");
+                }
+                Autor.listarAutores();
+                System.out.println("Digite enter para continuar");
+                sc.nextLine();
+                sc.nextLine();
+
                 break;
 
                 default:
