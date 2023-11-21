@@ -1,23 +1,35 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Sistema {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
-
+        Connection connManager = null;
+        try {
+            connManager = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/gestao_biblioteca",
+                    "root",
+                    "");
+        } catch (Exception e) {
+            System.out.println("Erro ao conectar com o banco de dados");
+            System.out.println(e.getMessage());
+            return;
+        }
         int op = 0;
 
         do {
             System.out.println("Sistema Biblioteca");
             System.out.println("0 - Sair");
             System.out.println("1 - Criar Autor");
-            System.out.println("2 - Criar Livro");
-            System.out.println("3 - Criar Biblioteca");
-            System.out.println("4 - Adicionar Livro");
-            System.out.println("5 - Emprestar Midia");
-            System.out.println("6 - Devolver Midia");
-            System.out.println("7 - Adicionar Midia Digital");
-            System.out.println("8 - Listar todas as midias");
-            System.out.println("9 - Listar todos autores");
+            System.out.println("2 - Criar Biblioteca");
+            System.out.println("3 - Criar Livro");
+            System.out.println("4 - Emprestar Midia");
+            System.out.println("5 - Devolver Midia");
+            System.out.println("6 - Adicionar Midia Digital");
+            System.out.println("7 - Listar todas as midias");
+            System.out.println("8 - Listar todos autores");
             System.out.println("Digite a opção");
             try {
                 op = sc.nextInt();
@@ -35,223 +47,110 @@ public class Sistema {
                     String nome = sc.next();
                     System.out.println("Digite a nacionalidade do autor");
                     String nacionalidade = sc.next();
-                    new Autor(nome, nacionalidade);
+                    Autor autor = new Autor(nome, nacionalidade);
+                    Autor.adicionarAutor(autor, connManager);
+
                     break;
                 case 2:
-                    if(Autor.autores.size() == 0){
-                        System.out.println("Não existe autor cadastrado");
-                        break;
-                    }
-                    System.out.println("Digite o titulo");
-                    sc.nextLine();
-                    String titulo = sc.nextLine();
-                    int posicaoAutor = -1;
-                    do {
-                        Autor.listarAutores();
-                        System.out.println("Digite o numero do autor");
-                        try {
-                            posicaoAutor = sc.nextInt();
-                            if (posicaoAutor >= Autor.autores.size()) {
-                                throw new Exception("Autor Invalido");
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Autor Invalido");
-                            posicaoAutor = -1;
-                        }
-                    } while (posicaoAutor < 0);
-                    Autor autor = Autor.autores.get(posicaoAutor);
-                    new Livro(titulo, autor, true);
-                    break;
-                case 3:
                     System.out.println("Digite o nome da biblioteca");
                     String nomeBiblioteca = sc.next();
-                    new Biblioteca(nomeBiblioteca);
+                    Biblioteca biblioteca = new Biblioteca(nomeBiblioteca);
+                    try {
+                        biblioteca.adicionarBiblioteca(biblioteca, connManager);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+
+                case 3:
+                    System.out.println("Digite o titulo do livro");
+                    String titulo = sc.next();
+                    Autor.listarAutores(connManager);
+                    sc.nextLine();
+
+                    System.out.println("Digite o id do autor");
+                    int idAutor = sc.nextInt();
+                    Autor autorLivro = Autor.findAutor(connManager, idAutor);
+                    Biblioteca.listarBibliotecas(connManager);
+                    System.out.println("Digite o id da biblioteca");
+                    int idBiblioteca = sc.nextInt();
+                    Biblioteca bibliotecaLivro = Biblioteca.findBiblioteca(connManager, idBiblioteca);
+                    Livro livro = new Livro(titulo, true);
+                    Livro.adicionarLivro(connManager, livro, autorLivro, bibliotecaLivro);
+
                     break;
                 case 4:
-                    if(Biblioteca.bibliotecas.size() == 0 || Livro.livros.size() == 0){
-                        System.out.println("Não existe biblioteca cadastrada ou livro cadastrado");
-                        break;
+                    System.out.println("Selecione o tipo de midia");
+                    System.out.println("1 - Livro");
+                    System.out.println("2 - Midia Digital");
+                    int tipoMidia = sc.nextInt();
+                    if (tipoMidia == 1) {
+                        System.out.println("Digite o id do livro");
+                        Livro.listarLivros(connManager);
+                        int idLivro = sc.nextInt();
+                        Livro.emprestar(connManager, idLivro);
                     }
-                    System.out.println("Digite o numero da biblioteca");
-                    Biblioteca.listarBiblotecas();
-                    int posicaoBiblioteca = -1;
-                    do {
-                        try {
-                            posicaoBiblioteca = sc.nextInt();
-                            if (posicaoBiblioteca >= Biblioteca.bibliotecas.size()) {
-                                throw new Exception("Biblioteca Invalida");
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Biblioteca Invalida");
-                            posicaoBiblioteca = -1;
-                        }
-                    } while (posicaoBiblioteca < 0);
-                    Biblioteca biblioteca = Biblioteca.bibliotecas.get(posicaoBiblioteca);
-                    System.out.println("Digite o numero do livro");
-                    Livro.listarLivros();
-                    int posicaoLivro = -1;
-                    do {
-                        try {
-                            posicaoLivro = sc.nextInt();
-                            if (posicaoLivro >= Livro.livros.size()) {
-                                throw new Exception("Livro Invalido");
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Livro Invalido");
-                            posicaoLivro = -1;
-                        }
-                    } while (posicaoLivro < 0);
-                    Livro livro = Livro.livros.get(posicaoLivro);
-                    if(biblioteca.midias.contains(livro)){
-                        System.out.println("Livro já cadastrado na biblioteca");
-                        break;
+                    if (tipoMidia == 2) {
+                        System.out.println("Digite o id da midia digital");
+                        MidiaDigital.listarMidiasDigitais(connManager);
+                        int idMidiaDigital = sc.nextInt();
+                        MidiaDigital.emprestar(connManager, idMidiaDigital);
                     }
-                    biblioteca.adicionarLivro(livro);
+
                     break;
                 case 5:
-                    if(Biblioteca.bibliotecas.size() == 0){
-                        System.out.println("Não existe biblioteca cadastrada ou livro cadastrado");
-                        break;
+                    System.out.println("Selecione o tipo de midia");
+                    System.out.println("1 - Livro");
+                    System.out.println("2 - Midia Digital");
+                    tipoMidia = sc.nextInt();
+                    if (tipoMidia == 1) {
+                        System.out.println("Digite o id do livro");
+                        Livro.listarLivros(connManager);
+                        int idLivro = sc.nextInt();
+                        Livro.devolver(connManager, idLivro);
                     }
-                    System.out.println("Digite o numero da biblioteca");
-                    Biblioteca.listarBiblotecas();
-                    posicaoBiblioteca = -1;
-                    do {
-                        try {
-                            posicaoBiblioteca = sc.nextInt();
-                            if (posicaoBiblioteca >= Biblioteca.bibliotecas.size()) {
-                                throw new Exception("Biblioteca Invalida");
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Biblioteca Invalida");
-                            posicaoBiblioteca = -1;
-                        }
-                    } while (posicaoBiblioteca < 0);
-                    biblioteca = Biblioteca.bibliotecas.get(posicaoBiblioteca);
-                    System.out.println("Digite o numero da midia desejada");
-                    biblioteca.listarMidias();
-                    posicaoLivro = -1;
-                    do {
-                        try {
-                            posicaoLivro = sc.nextInt();
-                            if (posicaoLivro >= biblioteca.midias.size()) {
-                                throw new Exception("Livro Invalido");
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Livro Invalido");
-                            posicaoLivro = -1;
-                        }
-                    } while (posicaoLivro < 0);
-                    Midia midia = biblioteca.midias.get(posicaoLivro);
-                    try {
-                        midia.emprestar();
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
+                    if (tipoMidia == 2) {
+                        System.out.println("Digite o id da midia digital");
+                        MidiaDigital.listarMidiasDigitais(connManager);
+                        int idMidiaDigital = sc.nextInt();
+                        MidiaDigital.devolver(connManager, idMidiaDigital);
                     }
+
                     break;
+
                 case 6:
-                    if(Biblioteca.bibliotecas.size() == 0){
-                        System.out.println("Não existe biblioteca cadastrada");
-                        break;
+                    sc.nextLine();
+                    System.out.println("Digite o titulo da midia digital");
+                    String tituloMidiaDigital = sc.nextLine();
+                    System.out.println("Digite o album da midia digital");
+                    String album = sc.nextLine();
+                    Biblioteca.listarBibliotecas(connManager);
+                    System.out.println("Digite o id da biblioteca");
+                    idBiblioteca = sc.nextInt();
+                    Biblioteca bibliotecaMidiaDigital = Biblioteca.findBiblioteca(connManager, idBiblioteca);
+                    MidiaDigital midiaDigital = new MidiaDigital(tituloMidiaDigital, album, true);
+                    MidiaDigital.adicionarMidiaDigital(connManager, midiaDigital, bibliotecaMidiaDigital);
+
+                    break;
+
+                case 7:
+                    System.out.println("Selecione o tipo de midia");
+                    System.out.println("1 - Livro");
+                    System.out.println("2 - Midia Digital");
+                    tipoMidia = sc.nextInt();
+                    if (tipoMidia == 1) {
+                        Livro.listarLivros(connManager);
                     }
-                    System.out.println("Digite o numero da biblioteca");
-                    Biblioteca.listarBiblotecas();
-                    posicaoBiblioteca = -1;
-                    do {
-                        try {
-                            posicaoBiblioteca = sc.nextInt();
-                            if (posicaoBiblioteca >= Biblioteca.bibliotecas.size()) {
-                                throw new Exception("Biblioteca Invalida");
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Biblioteca Invalida");
-                            posicaoBiblioteca = -1;
-                        }
-                    } while (posicaoBiblioteca < 0);
-                    biblioteca = Biblioteca.bibliotecas.get(posicaoBiblioteca);
-                    System.out.println("Digite o numero do livro");
-                    biblioteca.listarMidias();
-                    posicaoLivro = -1;
-                    do {
-                        try {
-                            posicaoLivro = sc.nextInt();
-                            if (posicaoLivro >= biblioteca.midias.size()) {
-                                throw new Exception("Livro Invalido");
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Livro Invalido");
-                            posicaoLivro = -1;
-                        }
-                    } while (posicaoLivro < 0);
-                    midia = biblioteca.midias.get(posicaoLivro);
-                    try {
-                        midia.devolver();
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
+                    if (tipoMidia == 2) {
+                        MidiaDigital.listarMidiasDigitais(connManager);
                     }
                     break;
-                case 7:
-                 if(Biblioteca.bibliotecas.size() == 0){
-                        System.out.println("Não existe biblioteca cadastrada ou livro cadastrado");
-                        break;
-                    }
-                System.out.println("Digite o numero da biblioteca");
-                Biblioteca.listarBiblotecas();
-                posicaoBiblioteca = -1;
-                do {
-                        try {
-                            posicaoBiblioteca = sc.nextInt();
-                            if (posicaoBiblioteca >= Biblioteca.bibliotecas.size()) {
-                                throw new Exception("Biblioteca Invalida");
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Biblioteca Invalida");
-                            posicaoBiblioteca = -1;
-                        }
-                    } while (posicaoBiblioteca < 0);
-                biblioteca = Biblioteca.bibliotecas.get(posicaoBiblioteca);
-                System.out.println("Digite o album da midia digital");
-                String album = sc.nextLine();
-                album = sc.nextLine();
-                System.out.println("Digite o titulo");
-                titulo = sc.nextLine();
-                biblioteca.adiocionarMidiaDigital(new MidiaDigital(titulo, album, true));
-                break;
-
+                
                 case 8:
-                System.out.println("Digite o numero da biblioteca");
-                Biblioteca.listarBiblotecas();
-                posicaoBiblioteca = -1;
-                do {
-                        try {
-                            posicaoBiblioteca = sc.nextInt();
-                            if (posicaoBiblioteca >= Biblioteca.bibliotecas.size()) {
-                                throw new Exception("Biblioteca Invalida");
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Biblioteca Invalida");
-                            posicaoBiblioteca = -1;
-                        }
-                    } while (posicaoBiblioteca < 0);
-                biblioteca = Biblioteca.bibliotecas.get(posicaoBiblioteca);
-                biblioteca.listarMidias();
-                System.out.println("Digite enter para continuar");
-                sc.nextLine();
-                sc.nextLine();
-        
-                break;
+                    Autor.listarAutores(connManager);
+                    break;
 
-                case 9:
-                if(Autor.autores.size() == 0){
-                    System.out.println("Não existe autores cadastrados");
-                }
-                Autor.listarAutores();
-                System.out.println("Digite enter para continuar");
-                sc.nextLine();
-                sc.nextLine();
-
-                break;
-
+             
                 default:
                     System.out.println("Opcão invalida");
                     break;

@@ -1,37 +1,73 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class Autor extends Pessoa{
+public class Autor extends Pessoa {
+    private int id;
     private String nacionalidade;
-    public static ArrayList<Autor> autores = new ArrayList<Autor>();
-    
 
-    public Autor(String nome, String nacionalidade){
+    public Autor(String nome, String nacionalidade) {
         super(nome);
         this.nacionalidade = nacionalidade;
-        autores.add(this);
     }
 
-    public void setNacionalidade(String nacionalidade){
+    public Autor(int id, String nome, String nacionalidade) {
+        super(nome);
+        this.id = id;
         this.nacionalidade = nacionalidade;
     }
 
-    public String getNacionalidade(){
+    public void setNacionalidade(String nacionalidade) {
+        this.nacionalidade = nacionalidade;
+    }
+
+    public String getNacionalidade() {
         return this.nacionalidade;
     }
-    
-    public ArrayList<Autor> getAutores(){
-        return Autor.autores;
+
+    public int getId() {
+        return this.id;
     }
 
-    public static void listarAutores(){
-        for(int i = 0; i < autores.size(); i++){
-            System.out.println(i + " - " + autores.get(i).toString());
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public static void adicionarAutor(Autor autor, Connection conn) throws SQLException {
+        PreparedStatement ps = conn.prepareStatement("INSERT INTO autor (nome, nacionalidade) VALUES (?, ?)");
+        ps.setString(1, autor.getNome());
+        ps.setString(2, autor.getNacionalidade());
+        ps.executeUpdate();
+
+    }
+
+    public static void listarAutores(Connection conn) throws SQLException {
+        PreparedStatement ps = conn.prepareStatement("SELECT * FROM autor");
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            System.out.println(rs.getInt("id") + " - " + rs.getString("nome") + " - " + rs.getString("nacionalidade"));
         }
+
     }
 
-    public String toString(){
-        return "Nome do Autor: " + super.getNome() + 
-        " Nacionalidade do Autor: " + this.nacionalidade;
+    public static Autor findAutor(Connection conn, int id) throws SQLException {
+        PreparedStatement ps = conn.prepareStatement("SELECT * FROM autor WHERE id = ?");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            Autor autor = new Autor(rs.getInt("id"), rs.getString("nome"), rs.getString("nacionalidade"));
+            return autor;
+        } else {
+            return null;
+        }
+
+    }
+
+    public String toString() {
+        return "Nome do Autor: " + super.getNome() +
+                " Nacionalidade do Autor: " + this.nacionalidade;
     }
 
 }
